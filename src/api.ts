@@ -1,5 +1,5 @@
 import {toUint8Array} from 'https://deno.land/x/base64/mod.ts'
-import {createError} from 'https://deno.land/x/cstack/mod.ts'
+import {CostumStack} from 'https://deno.land/x/cstack@0.4.6/mod.ts'
 
 async function checkAPI(): Promise<string | boolean> {
   return await MCStatus().then((res: Record<string, string>[]) => {
@@ -218,7 +218,7 @@ export async function login(email: string, password: string, secQues: string[] =
       )
         .then(res => res.json())
         .then(res => {
-          if (res.errorMessage !== undefined) throw createError(new Error(res.errorMessage))
+          if (res.errorMessage !== undefined) throw CustomStack(new Error(res.errorMessage))
           else {
             token = res.accessToken
             UUID = res.selectedProfile.id
@@ -272,7 +272,7 @@ export async function login(email: string, password: string, secQues: string[] =
         })
         .then(res => {
           if (res.constructor !== String && res.every((el: any) => typeof el === 'string')) return res
-          if (res.errorMessage !== undefined) throw createError(new Error(res.errorMessage))
+          if (res.errorMessage !== undefined) throw CustomStack(new Error(res.errorMessage))
           return {token, UUID}
         })
   })
@@ -296,8 +296,8 @@ export async function rename(sec: Record<string, string>, newName: string): Prom
   return await req('PUT', `https://api.minecraftservices.com/minecraft/profile/name/${newName}`, {
     Authorization: `Bearer ${sec.token}`
   }).then(res => {
-    if (res.status === 400) throw createError(new Error('Name is invalid, longer than 16 characters or contains characters other than (a-zA-Z0-9_)'))
-    if (res.status === 403) throw createError(new Error('Name is unavailable (Either taken or has not become available)'))
+    if (res.status === 400) throw CustomStack(new Error('Name is invalid, longer than 16 characters or contains characters other than (a-zA-Z0-9_)'))
+    if (res.status === 403) throw CustomStack(new Error('Name is unavailable (Either taken or has not become available)'))
     else return sec
   })
 }
